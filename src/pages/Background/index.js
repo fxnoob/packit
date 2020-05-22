@@ -1,7 +1,3 @@
-import '../../assets/img/logo16.png';
-import '../../assets/img/logo48.png';
-import '../../assets/img/logo128.png';
-
 import chromeService from "../../services/chromeService";
 import Db,{ Schema } from '../../services/dbService';
 

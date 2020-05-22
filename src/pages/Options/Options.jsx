@@ -1,10 +1,17 @@
 import React from 'react';
+import 'tui-image-editor/dist/tui-image-editor.css'
 import axios from 'axios';
+import Button from '@material-ui/core/Button';
+import Dialog from '@material-ui/core/Dialog';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogContent from '@material-ui/core/DialogContent';
+import ImageEditor from '../../containers/ImageEditor';
 import Db from '../../services/dbService';
 const queryString = require("query-string");
 const parsed = queryString.parse(location.search);
 const db = new Db();
 export default class Card extends React.Component {
+  editorRef = React.createRef();
   constructor() {
     super();
     this.urlString = decodeURIComponent(parsed.url ? parsed.url : "");
@@ -16,6 +23,8 @@ export default class Card extends React.Component {
       favorite: '',
       type: 'sketch',
       isSaving: false,
+      openImageEditor: false,
+      imageInstance: null,
     };
   }
   componentDidMount() {
@@ -117,61 +126,111 @@ export default class Card extends React.Component {
       alert("error");
     }
   }
+  imageEditorOpener = () => {
+    console.log({ref: this.editorRef.current});
+    this.setState({openImageEditor: true});
+  }
+  imageEditorClose = () => {
+    const dataUrl = this.state.imageInstance.toDataURL();
+    console.log({dataUrl})
+    this.setState({imageUrl: dataUrl, openImageEditor: false});
+  }
+  getInstance = imageInstance => {
+    this.setState({imageInstance: imageInstance});
+  }
   render() {
     return (
-      <form
-        onSubmit={(evt) => {
-          this.handleSubmit(evt);
-        }}
-      >
-        <img src={this.urlString} style={{width: '300px', height: '300px'}}/>
-        <br/>
-        <input
-          name="imageUrl"
-          type="hidden"
-          placeholder="Image Url"
-          value={this.urlString}
-        />
-
-        <input
-          name="title"
-          type="text"
-          placeholder={`Card Title default name is ${this.state.type}`}
-          value={this.state.title}
-          onChange={this.handleChange}
-        />
-
-        <textarea
-          name="description"
-          type="text"
-          placeholder="Description"
-          value={this.state.description}
-          onChange={this.handleChange}
-        />
-
-        <input
-          name="tags"
-          type="text"
-          placeholder={`tags (separated by ,)`}
-          value={this.state.tags}
-          onChange={this.handleChange}
-        />
-        <select
-          id="type"
-          name="type"
-          value={this.state.type}
-          onChange={this.handleChange}
+      <React.Fragment>
+        <Dialog
+          fullScreen
+          open={this.state.openImageEditor}
+          onClose={this.imageEditorClose}
+          aria-labelledby="simple-modal-title"
+          aria-describedby="simple-modal-description"
         >
-          <option value="sketch">Sketch </option>
-          <option value="size">Size</option>
-          <option value="material">Material</option>
-          <option value="table">table</option>
-        </select>
+          <DialogContent>
+            <ImageEditor
+              getInstance={this.getInstance}
+              ref={this.editorRef}
+              includeUI={{
+                loadImage: {
+                  path: this.state.imageUrl,
+                  name: 'SampleImage'
+                },
+                menuBarPosition: 'top'
+              }}
+              cssMaxHeight={400}
+              cssMaxWidth={700}
+              selectionStyle={{
+                cornerSize: 20,
+                rotatingPointOffset: 70
+              }}
+              usageStatistics={true}
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={this.imageEditorClose} color="primary">
+              Close
+            </Button>
+            <Button onClick={this.imageEditorClose} color="primary" autoFocus>
+              Done
+            </Button>
+          </DialogActions>
+        </Dialog>
+        <form
+          onSubmit={(evt) => {
+            this.handleSubmit(evt);
+          }}
+        >
+          <img onClick={this.imageEditorOpener} src={this.state.imageUrl} style={{width: '300px', height: '300px'}}/>
+          <br/>
+          <input
+            name="imageUrl"
+            type="hidden"
+            placeholder="Image Url"
+            value={this.urlString}
+          />
 
-        <button className="button" type="submit" disabled={this.state.isSaving}>
-          {this.state.isSaving==true? 'Saving...': 'Save'}
-        </button>
-      </form>
+          <input
+            name="title"
+            type="text"
+            placeholder={`Card Title default name is ${this.state.type}`}
+            value={this.state.title}
+            onChange={this.handleChange}
+          />
+
+          <textarea
+            name="description"
+            type="text"
+            placeholder="Description"
+            value={this.state.description}
+            onChange={this.handleChange}
+          />
+
+          <input
+            name="tags"
+            type="text"
+            placeholder={`tags (separated by ,)`}
+            value={this.state.tags}
+            onChange={this.handleChange}
+          />
+          <select
+            id="type"
+            name="type"
+            value={this.state.type}
+            onChange={this.handleChange}
+          >
+            <option value="sketch">Sketch </option>
+            <option value="size">Size</option>
+            <option value="material">Material</option>
+            <option value="table">table</option>
+          </select>
+
+          <button className="button" type="submit" disabled={this.state.isSaving}>
+            {this.state.isSaving==true? 'Saving...': 'Save'}
+          </button>
+        </form>
+      </React.Fragment>
     );
   }
 }

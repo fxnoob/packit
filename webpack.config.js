@@ -49,32 +49,31 @@ var options = {
   module: {
     rules: [
       {
-        test: /\.css$/,
-        loader: 'style-loader!css-loader',
-        exclude: /node_modules/,
-      },
-      {
-        test: new RegExp('.(' + fileExtensions.join('|') + ')$'),
-        loader: 'file-loader?name=[name].[ext]',
-        exclude: /node_modules/,
-      },
-      {
-        test: /\.html$/,
-        loader: 'html-loader',
-        exclude: /node_modules/,
-      },
-      {
         test: /\.(js|jsx)$/,
-        loader: 'babel-loader',
         exclude: /node_modules/,
+        use: ['babel-loader'],
+      },
+      {
+        test: /\.css$/,
+        use: ['style-loader', 'css-loader'],
+      },
+      {
+        test: /\.(gif|png|jpe?g|svg)$/i,
+        use: [
+          'file-loader',
+          {
+            loader: 'image-webpack-loader',
+            options: {
+              bypassOnDebug: true, // webpack@1.x
+              disable: true, // webpack@2.x and newer
+            },
+          },
+        ],
       },
     ],
   },
   resolve: {
-    alias: alias,
-    extensions: fileExtensions
-      .map((extension) => '.' + extension)
-      .concat(['.jsx', '.js', '.css', '.json']),
+    extensions: ['*', '.js', '.jsx', '.css', '.json'],
   },
   plugins: [
     new webpack.ProgressPlugin(),
@@ -115,6 +114,7 @@ var options = {
           to: path.join(__dirname, 'build'),
           force: true,
         },
+        { from: 'src/assets/img/', to: path.join(__dirname, 'build'), force: true },
       ],
       {
         logLevel: 'info',
