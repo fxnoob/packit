@@ -51,29 +51,29 @@ var options = {
       {
         test: /\.(js|jsx)$/,
         exclude: /node_modules/,
-        use: ["babel-loader"]
+        use: ['babel-loader'],
       },
       {
         test: /\.css$/,
-        use: ["style-loader", "css-loader"]
+        use: ['style-loader', 'css-loader'],
       },
       {
         test: /\.(gif|png|jpe?g|svg)$/i,
         use: [
-          "file-loader",
+          'file-loader',
           {
-            loader: "image-webpack-loader",
+            loader: 'image-webpack-loader',
             options: {
               bypassOnDebug: true, // webpack@1.x
-              disable: true // webpack@2.x and newer
-            }
-          }
-        ]
-      }
-    ]
+              disable: true, // webpack@2.x and newer
+            },
+          },
+        ],
+      },
+    ],
   },
   resolve: {
-    extensions: ["*", ".js", ".jsx", ".css", ".json"]
+    extensions: ['*', '.js', '.jsx', '.css', '.json'],
   },
   plugins: [
     new webpack.ProgressPlugin(),
@@ -114,6 +114,7 @@ var options = {
           to: path.join(__dirname, 'build'),
           force: true,
         },
+        { from: 'src/assets/img/', to: path.join(__dirname, 'build'), force: true },
       ],
       {
         logLevel: 'info',

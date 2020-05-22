@@ -157,8 +157,6 @@ export default class Card extends React.Component {
                   path: this.state.imageUrl,
                   name: 'SampleImage'
                 },
-                menu: ['shape', 'filter'],
-                initMenu: 'filter',
                 menuBarPosition: 'top'
               }}
               cssMaxHeight={400}
